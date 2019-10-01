@@ -3,20 +3,24 @@
 
 ### Docker
 
-$ git clone https://github.com/wurstmeister/kafka-docker.git\
+$ git clone https://github.com/wurstmeister/kafka-docker.git \
 $ cd kafka-docker\
+Edit docker-compose.yml, change line 12 to
+```
+HOSTNAME_COMMAND: "route -n | awk '/UG[ \t]/{print $$2}'"
+```
 $ docker-compose up -d\
 $ docker-compose top\
-$ docker exec -ti kafka-docker_kafka_1 bash\
+$ docker exec -ti kafka-docker_kafka_1 bash
 
 ## Kafka Commands
 
 
 ### Topic list
-kafka-topics.sh --zookeeper zookeeper  --list
+1. kafka-topics.sh --zookeeper zookeeper  --list
 
 ### Create new topic
-kafka-topics.sh --zookeeper zookeeper --create -topic warsaw
+2. kafka-topics.sh --zookeeper zookeeper --create -topic warsaw
 ```
 Missing required argument "[partitions]"
 Option                                   Description
@@ -26,21 +30,20 @@ Option                                   Description
                                            configuration for the topic.    
 ```
 
-kafka-topics.sh --zookeeper zookeeper --create -topic warsaw --partitions 1 --replication-factor 1
+3. kafka-topics.sh --zookeeper zookeeper --create -topic warsaw --partitions 1 --replication-factor 1
 ```
 Created topic warsaw.
 ```
 
-kafka-topics.sh --zookeeper zookeeper --list
-
-kafka-topics.sh --zookeeper zookeeper --describe
+4. kafka-topics.sh --zookeeper zookeeper --list\
+5. kafka-topics.sh --zookeeper zookeeper --describe
 ```
 Topic:warsaw	PartitionCount:1	ReplicationFactor:1	Configs:
 	Topic: warsaw	Partition: 0	Leader: 1001	Replicas: 1001	Isr: 1001
 ```
 
 ### Produce message
-kafka-console-producer.sh --broker-list kafka:9092 --topic warsaw
+6. kafka-console-producer.sh --broker-list kafka:9092 --topic warsaw
 ```
 >warsaw
 >kafka
@@ -48,14 +51,14 @@ kafka-console-producer.sh --broker-list kafka:9092 --topic warsaw
 ```
 
 ### Read message
-cd /kafka/kafka-logs-*/
+7. cd /kafka/kafka-logs-*/
 ```
 bash-4.4# ls
 cleaner-offset-checkpoint         meta.properties                   replication-offset-checkpoint
 log-start-offset-checkpoint       recovery-point-offset-checkpoint  warsaw-0
 ```
 
-kafka-run-class.sh kafka.tools.DumpLogSegments --print-data-log --deep-iteration --files 00000000000000000000.log
+8. kafka-run-class.sh kafka.tools.DumpLogSegments --print-data-log --deep-iteration --files 00000000000000000000.log
 ```
 Dumping 00000000000000000000.log
 Starting offset: 0
@@ -65,7 +68,7 @@ baseOffset: 0 lastOffset: 0 count: 1 baseSequence: -1 lastSequence: -1 producerI
 
 
 ### Performance test part 1
-kafka-producer-perf-test.sh --print-metrics  --topic warsaw --num-records 1000000 --record-size 100 --throughput 15000000 --producer-props acks=1 bootstrap.servers=kafka:9092 buffer.memory=67108864 compression.type=none batch.size=8196
+9. kafka-producer-perf-test.sh --print-metrics  --topic warsaw --num-records 1000000 --record-size 100 --throughput 15000000 --producer-props acks=1 bootstrap.servers=kafka:9092 buffer.memory=67108864 compression.type=none batch.size=8196
 ```
 ops acks=1 bootstrap.servers=kafka:9092 buffer.memory=67108864 compression.type=none batch.size=8196
 826349 records sent, 165269.8 records/sec (15.76 MB/sec), 1844.7 ms avg latency, 2362.0 ms max latency.
@@ -73,7 +76,7 @@ ops acks=1 bootstrap.servers=kafka:9092 buffer.memory=67108864 compression.type=
 ```
 
 ### Performance test part 2
-kafka-topics.sh --zookeeper zookeeper --alter --topic warsaw --partitions 9
+10. kafka-topics.sh --zookeeper zookeeper --alter --topic warsaw --partitions 9
 ```
 WARNING: If partitions are increased for a topic that has a key, the partition logic or ordering of the messages will be affected
 Adding partitions succeeded!
@@ -137,8 +140,9 @@ Topic:warsaw	PartitionCount:9	ReplicationFactor:1	Configs:
 	Topic: warsaw	Partition: 2	Leader: -1	Replicas: 1001	Isr: 1001
 ```
 kafka-topics.sh --zookeeper zookeeper:2181 --describe --under-replicated-partitions
-```Topic: meetup	Partition: 0	Leader: 1003	Replicas: 1003,1001	Isr: 1003
-	Topic: meetup	Partition: 1	Leader: 1002	Replicas: 1001,1002	Isr: 1002
+```
+Topic: meetup	Partition: 0	Leader: 1003	Replicas: 1003,1001	Isr: 1003
+Topic: meetup	Partition: 1	Leader: 1002	Replicas: 1001,1002	Isr: 1002
 ```
 $ docker start kafka-docker_kafka_1
 
@@ -163,7 +167,7 @@ warsaw-meetup   warsaw          1          111111          111111          0    
 warsaw-meetup   warsaw          8          111111          111111          0               consumer-1-7898de52-6afb-46bb-9610-cb53db3fa598 /172.19.0.1     consumer-1
 warsaw-meetup   warsaw          0          1111117         1111117        0               consumer-1-7898de52-6afb-46bb-9610-cb53db3fa598 /172.19.0.1     consumer-1
 ```
-Stop kafka-console-consumer.sh
+$ Stop kafka-console-consumer.sh
 
 kafka-console-producer.sh --broker-list kafka:9092 --topic warsaw
 Produce few messages
