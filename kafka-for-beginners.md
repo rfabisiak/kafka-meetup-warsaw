@@ -3,13 +3,11 @@
 
 ### Docker
 
-git clone https://github.com/wurstmeister/kafka-docker.git
-cd kafka-docker
-
-docker-compose up -d
-docker-compose top
-
-docker exec -ti kafka-docker_kafka_1 bash
+$ git clone https://github.com/wurstmeister/kafka-docker.git\
+$ cd kafka-docker\
+$ docker-compose up -d\
+$ docker-compose top\
+$ docker exec -ti kafka-docker_kafka_1 bash\
 
 ## Kafka Commands
 
@@ -85,13 +83,13 @@ kafka-producer-perf-test.sh --print-metrics  --topic warsaw --num-records 100000
 1000000 records sent, 387596.899225 records/sec (36.96 MB/sec), 158.45 ms avg latency, 279.00 ms max latency, 167 ms 50th, 244 ms 95th, 254 ms 99th, 262 ms 99.9th.
 ```
 
-###3 Nodes Kafka cluster
-docker-compose scale kafka=3
-docker-compose top
+### Kafka cluster 3 brokers
+$ docker-compose scale kafka=3\
+$ docker-compose top
 
 
-###Zookeeper down
-docker stop kafka-docker_zookeeper_1
+### Zookeeper down
+$ docker stop kafka-docker_zookeeper_1
 
 bash-4.4#  kafka-topics.sh --zookeeper zookeeper --create -topic warsaw_test --partitions 1 --replication-factor 1
 ```
@@ -104,14 +102,14 @@ java.lang.IllegalArgumentException: Unable to canonicalize address zookeeper:218
 [2019-10-01 09:50:07,373] WARN Session 0x0 for server zookeeper:2181, unexpected error, closing socket connection and attempting reconnect (org.apache.zookeeper.ClientCnxn)
 ```
 
-docker start kafka-docker_zookeeper_1
-###Zookeeper CLI
+$ docker start kafka-docker_zookeeper_1
+### Zookeeper CLI
 
 
 
 
-###Kafka HA
-docker exec -ti kafka-docker_kafka_1 bash
+### Kafka HA
+$ docker exec -ti kafka-docker_kafka_1 bash
 
 kafka-topics.sh --zookeeper zookeeper --create -topic meetup --partitions 3 --replication-factor 2
 ```Created topic meetup.```
@@ -125,9 +123,9 @@ kafka-topics.sh --zookeeper zookeeper --describe
 
 kafka-producer-perf-test.sh --print-metrics  --topic meetup --num-records 1000000 --record-size 100 --throughput 15000000 --producer-props acks=1 bootstrap.servers=kafka:9092 buffer.memory=67108864 compression.type=none batch.size=8196
 
-docker stop kafka-docker_kafka_1
+$ docker stop kafka-docker_kafka_1
 
-docker exec -ti kafka-docker_kafka_2 bash
+$ docker exec -ti kafka-docker_kafka_2 bash
 kafka-topics.sh --zookeeper zookeeper:2181 --describe
 ```Topic:meetup	PartitionCount:3	ReplicationFactor:2	Configs:
 	Topic: meetup	Partition: 0	Leader: 1003	Replicas: 1003,1001	Isr: 1003
@@ -142,11 +140,11 @@ kafka-topics.sh --zookeeper zookeeper:2181 --describe --under-replicated-partiti
 ```Topic: meetup	Partition: 0	Leader: 1003	Replicas: 1003,1001	Isr: 1003
 	Topic: meetup	Partition: 1	Leader: 1002	Replicas: 1001,1002	Isr: 1002
 ```
-docker start kafka-docker_kafka_1
+$ docker start kafka-docker_kafka_1
 
 kafka-topics.sh --zookeeper zookeeper:2181 --describe
 
-###Kafka consumer, lag
+### Kafka consumer, lag
 
 kafka-consumer-groups.sh --bootstrap-server kafka:9092  --list
 
